@@ -28,29 +28,27 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/application/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
 
-    # Ensure we're running Maven in the correct directory (root directory)
+    # Change working directory to 'application' where pom.xml is located
     - name: Build with Maven
-      run: |
-        cd $(pwd)  # Ensure we're in the root directory (you can remove this line if it's default)
-        mvn clean install --no-transfer-progress
+      working-directory: ./application  # Set the correct directory where pom.xml is located
+      run: mvn clean install --no-transfer-progress
 
     - name: Run tests with Maven
-      run: |
-        cd $(pwd)  # Ensure we're in the root directory
-        mvn test --no-transfer-progress
+      working-directory: ./application  # Make sure tests are run from the correct directory
+      run: mvn test --no-transfer-progress
 
     - name: Publish test results to GitHub
       if: success() || failure()
-      run: |
-        cd $(pwd)  # Ensure we're in the root directory
-        mvn surefire-report:report
+      working-directory: ./application  # Ensure the correct directory is used for reporting
+      run: mvn surefire-report:report
 
     - name: Upload test results (JUnit)
       if: success() || failure()
+      working-directory: ./application  # Ensure the correct directory for test results
       uses: actions/upload-artifact@v4
       with:
         name: test-results
