@@ -16,35 +16,42 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3  # Use the latest version of the checkout action
+      uses: actions/checkout@v3
 
     - name: Set up JDK 17
       uses: actions/setup-java@v2
       with:
-        java-version: '17'  # Ensure we use Java 17
-        distribution: 'adoptopenjdk'  # Specify the distribution (e.g., adoptopenjdk or zulu)
+        java-version: '17'
+        distribution: 'adoptopenjdk'  # Make sure the distribution is set correctly
 
     - name: Cache Maven dependencies
-      uses: actions/cache@v3  # Use the latest version of actions/cache
+      uses: actions/cache@v3
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
 
+    # Ensure we're running Maven in the correct directory (root directory)
     - name: Build with Maven
-      run: mvn clean install --no-transfer-progress  # This will compile and package your application
+      run: |
+        cd $(pwd)  # Ensure we're in the root directory (you can remove this line if it's default)
+        mvn clean install --no-transfer-progress
 
     - name: Run tests with Maven
-      run: mvn test --no-transfer-progress  # This will run the tests defined in the `pom.xml`
+      run: |
+        cd $(pwd)  # Ensure we're in the root directory
+        mvn test --no-transfer-progress
 
     - name: Publish test results to GitHub
-      if: success() || failure()  # This step is always executed if tests pass or fail
-      run: mvn surefire-report:report  # Generates test reports
+      if: success() || failure()
+      run: |
+        cd $(pwd)  # Ensure we're in the root directory
+        mvn surefire-report:report
 
     - name: Upload test results (JUnit)
       if: success() || failure()
-      uses: actions/upload-artifact@v4  # Use the latest version of actions/upload-artifact
+      uses: actions/upload-artifact@v4
       with:
         name: test-results
-        path: target/test-classes  # Adjust path based on where Maven generates the test results
+        path: target/test-classes
