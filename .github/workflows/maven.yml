@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3  # Updated to v3
 
     - name: Set up JDK 17
       uses: actions/setup-java@v2
@@ -24,7 +24,7 @@ jobs:
         java-version: '17'  # Use the same Java version as your pom.xml
 
     - name: Cache Maven dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3  # Updated to v3
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -43,7 +43,7 @@ jobs:
 
     - name: Upload test results (JUnit)
       if: success() || failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3  # Updated to v3
       with:
         name: test-results
         path: target/test-classes
