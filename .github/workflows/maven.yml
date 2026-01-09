@@ -1,0 +1,49 @@
+name: Maven Build and Test
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'  # Use the same Java version as your pom.xml
+
+    - name: Cache Maven dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: Build with Maven
+      run: mvn clean install --no-transfer-progress
+
+    - name: Run tests with Maven
+      run: mvn test --no-transfer-progress
+
+    - name: Publish test results to GitHub
+      if: success() || failure()
+      run: mvn surefire-report:report
+
+    - name: Upload test results (JUnit)
+      if: success() || failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: target/test-classes
