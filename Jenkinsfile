@@ -47,7 +47,7 @@ pipeline {
                     contentType: 'APPLICATION_JSON',
                     requestBody: """
                     {
-                      "text": "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                      "text": "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
                     }
                     """
                 )
@@ -62,7 +62,7 @@ pipeline {
                     contentType: 'APPLICATION_JSON',
                     requestBody: """
                     {
-                      "text": "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                      "text": "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
                     }
                     """
                 )
