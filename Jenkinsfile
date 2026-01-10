@@ -5,10 +5,6 @@ pipeline {
         maven 'M3'
     }
 
-    environment {
-        SLACK_CHANNEL = '#project-devops'
-    }
-
     stages {
 
         stage('Checkout') {
@@ -45,17 +41,30 @@ pipeline {
     post {
         success {
             withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
-                slackSend(
-                    webhookUrl: env.SLACK_WEBHOOK,
-                    message: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                httpRequest(
+                    httpMode: 'POST',
+                    url: env.SLACK_WEBHOOK,
+                    contentType: 'APPLICATION_JSON',
+                    requestBody: """
+                    {
+                      "text": "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                    }
+                    """
                 )
             }
         }
+
         failure {
             withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
-                slackSend(
-                    webhookUrl: env.SLACK_WEBHOOK,
-                    message: "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                httpRequest(
+                    httpMode: 'POST',
+                    url: env.SLACK_WEBHOOK,
+                    contentType: 'APPLICATION_JSON',
+                    requestBody: """
+                    {
+                      "text": "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                    }
+                    """
                 )
             }
         }
