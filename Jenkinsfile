@@ -42,23 +42,22 @@ pipeline {
         }
     }
 
-post {
-    success {
-        withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
-            slackSend(
-                webhookUrl: env.SLACK_WEBHOOK,
-                message: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-            )
+    post {
+        success {
+            withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
+                slackSend(
+                    webhookUrl: env.SLACK_WEBHOOK,
+                    message: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                )
+            }
+        }
+        failure {
+            withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
+                slackSend(
+                    webhookUrl: env.SLACK_WEBHOOK,
+                    message: "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                )
+            }
         }
     }
-    failure {
-        withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
-            slackSend(
-                webhookUrl: env.SLACK_WEBHOOK,
-                message: "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-            )
-        }
-    }
-}
-
 }
